@@ -21,37 +21,42 @@ Le projet inclut un circuit d'amplification pour le signal du capteur en graphè
 
 En complément de la programmation Arduino, ce projet est accompagné de fichiers KiCad détaillant le design d'un Shield UNO personnalisé. Cette approche modulaire facilite le montage et l'intégration de l'ensemble des composants, permettant ainsi une grande flexibilité dans la configuration du système.
 
+
 ## 🌟 Fonctionnalités
 
-- **Capteur de contrainte en graphène** : Exploite les propriétés du graphène pour une mesure précise.
+- **Capteur de contrainte en graphène** : Exploite les propriétés du graphène pour une mesure de contrainte.
 - **Circuit d'amplification avec réglage** : Potentiomètre digital pour ajuster le gain.
-- **Modules intégrés** : Communication Bluetooth, affichage sur écran OLED, et interaction utilisateur via encodeur rotatoire.
+- **Modules intégrés** : Communication Bluetooth, affichage sur écran OLED et interaction utilisateur via encodeur rotatoire.
 - **Design modulaire** : Fichiers KiCad pour un Shield UNO personnalisé.
+
 
 ## 📦 Matériel nécessaire
 
-- Arduino UNO
-- Capteur en graphène
-- Circuit d'amplification
-- Potentiomètre digital
-- Module Bluetooth
-- Écran OLED
-- Encodeur rotatoire
-- Composants pour le circuit
+- Capteur graphène (à fabriquer soi-même)
+- Arduino UNO (https://store.arduino.cc/products/arduino-uno-rev3)
+- Circuit d'amplification : LTC1050#CN8 + 2x100kΩ ; 10kΩ ; 1kΩ ; 3x100nF ; 1µF (https://www.analog.com/en/products/ltc1050.html)
+- Potentiomètre digital : MCP41050-IP (https://www.microchip.com/en-us/product/mcp41050)
+- Module Bluetooth : HC-05 (https://www.gotronic.fr/art-module-bluetooth-hc05-26097.htm)
+- Écran OLED : SSD1306 (https://electropeak.com/0-96-oled-64x128-display-module)
+- Encodeur rotatoire (https://www.az-delivery.de/fr/products/drehimpulsgeber-modul)
+
 
 ## 🔧 Installation
 
 1. Assemblez le circuit selon les schémas fournis dans les fichiers KiCad.
-2. Installez l'IDE Arduino et téléchargez le code source sur votre Arduino UNO.
-3. Connectez les modules et le capteur en suivant la documentation.
+2. Connectez les modules et le capteur en suivant le schéma KiCad.
+3. Installez l'IDE Arduino et téléchargez le code source sur votre Arduino UNO.
+
 
 ## 🖥️ Utilisation
 
 Utilisez l'encodeur rotatoire et le potentiomètre pour naviguer dans le menu de l'écran OLED et ajuster les paramètres tels que le gain de l'amplificateur.
 
+
 ## 🤝 Contribuer
 
 Les contributions sont bienvenues ! Si vous avez des idées d'amélioration, n'hésitez pas à forker le projet, soumettre des pull requests ou ouvrir des issues.
+
 
 ## 📜 Licence
 
