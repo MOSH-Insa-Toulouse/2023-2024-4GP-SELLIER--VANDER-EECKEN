@@ -8,6 +8,8 @@
   </a>
 </p>
 
+![](https://github.com/MOSH-Insa-Toulouse/2023-2024-4GP-SELLIER--VANDER-EECKEN/blob/main/PCB_design.gif)
+
 <h1 align="center">🔩 Mesure de contrainte avec capteur en graphène sous Arduino 🤖</h1>
 
 
