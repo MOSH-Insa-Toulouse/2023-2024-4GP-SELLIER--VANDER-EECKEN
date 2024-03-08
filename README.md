@@ -46,7 +46,8 @@ En complément de la programmation Arduino, ce projet est accompagné de fichier
 
 1. Assemblez le circuit selon les schémas fournis dans les fichiers KiCad.
 2. Connectez les modules et le capteur en suivant le schéma KiCad.
-3. Installez l'IDE Arduino et téléchargez le code source sur votre Arduino UNO.
+3. Installez l'IDE Arduino et installez la librairie "Adafruit_SSD1306"
+4. Téléchargez le code source sur votre Arduino UNO.
 
 
 ## 🖥️ Utilisation
