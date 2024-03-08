@@ -39,6 +39,7 @@ En complément de la programmation Arduino, ce projet est accompagné de fichier
 - Module Bluetooth : HC-05 (https://www.gotronic.fr/art-module-bluetooth-hc05-26097.htm)
 - Écran OLED : SSD1306 (https://electropeak.com/0-96-oled-64x128-display-module)
 - Encodeur rotatoire (https://www.az-delivery.de/fr/products/drehimpulsgeber-modul)
+- Capteur FLEX (https://www.kiwi-electronics.com/en/short-flex-bend-sensor-2172)
 
 
 ## 🔧 Installation
