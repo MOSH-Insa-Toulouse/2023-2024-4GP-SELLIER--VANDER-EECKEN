@@ -8,8 +8,8 @@
 #define SW 5 // Broche 5 en tant que SW, raccordé sur SW du KY-040
 #define txPin 6 // Broche 6 en tant que TX, raccordé sur TX du HC-05
 #define rxPin 7 // Broche 7 en tant que RX, raccordé sur RX du HC-05
-#define SS 10 // Broche 10 en tant que SS, raccordé sur SS du MCP41050
 #define MOSI 11 // Broche 11 en tant que MOSI, raccordé sur MOSI du MCP41050
+#define SS 12 // Broche 12 en tant que SS, raccordé sur SS du MCP41050
 #define SCK 13 // Broche 13 en tant que SCK, raccordé sur SCK du MCP41050
 #define Ampli A0 // Broche A0 en tant que Ampli, raccordé sur la sortie du LTC1050#CN8
 #define Flex A1 // Broche A1 en tant que Flex, raccordé sur le pont diviseur du capteur Flex
