@@ -32,6 +32,9 @@ const float gain_max = 800; // 1 + R_amp/(R_min+R_wiper)
 const float gain_min = 3; // 1 + R_amp/(R_max+R_wiper)
 float gain = 3; // Gain par défaut, le gain vaut 1+(R_amp/R_mcp)
 float ancien_gain = 3; // Variable utilisée pour checker un changement de gain
+float R_mcp ;
+
+
 
 Adafruit_SSD1306 ecranOLED(nombreDePixelsEnLargeur, nombreDePixelsEnHauteur, &Wire, brocheResetOLED); // Initilisation de l'écran
 
@@ -119,4 +122,26 @@ void Encodeur_interrupt() {
   } else {
     Pos_encodeur--;
   }
+}
+
+int bluetooth_gain(){
+
+  while (Serial.available()) {
+	   do{
+       R_mcp = Serial.read()*392;
+       delay(3);
+     }
+  }
+
+  gain = 1+(R_amp/R_mcp);
+  return gain;
+
+}
+
+void bluetooth_graph(int R_flex, int R_capt){
+  while (mySerial.available()) {
+		Serial.print((R_capt)mySerial.read());
+    Serial.print((R_capt)mySerial.read());
+    Serial.print((R_flex)mySerial.read());
+
 }
