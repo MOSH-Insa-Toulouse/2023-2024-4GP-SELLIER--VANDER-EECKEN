@@ -46,13 +46,13 @@ En complément de la programmation Arduino, ce projet est accompagné de fichier
 
 1. Assemblez le circuit selon les schémas fournis dans les fichiers KiCad.
 2. Connectez les modules et le capteur en suivant le schéma KiCad.
-3. Installez l'IDE Arduino et installez la librairie "Adafruit_SSD1306"
+3. Installez l'IDE Arduino et installez la librairie "U8glib"
 4. Téléchargez le code source sur votre Arduino UNO.
 
 
 ## 🖥️ Utilisation
 
-Utilisez l'encodeur rotatoire et le potentiomètre pour naviguer dans le menu de l'écran OLED et ajuster les paramètres tels que le gain de l'amplificateur.
+Utilisez l'encodeur rotatoire pour naviguer dans le menu de l'écran OLED.
 
 
 ## 🤝 Contribuer
