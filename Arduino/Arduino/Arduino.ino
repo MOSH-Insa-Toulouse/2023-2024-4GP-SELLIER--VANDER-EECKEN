@@ -30,15 +30,19 @@ const float R_amp = 100000.0; // Résistance en sortie de l'amplificateur
 const float R_wiper = 125.0; // Résistance interne du MCP41050
 const float gain_max = 800; // 1 + R_amp/(R_min+R_wiper)
 const float gain_min = 3; // 1 + R_amp/(R_max+R_wiper)
-float gain = 3; // Gain par défaut, le gain vaut 1+(R_amp/R_mcp)
+float gain = 3; // Gain par défaut, le gain vaut 1 + R_amp/(R_mcp + R_wiper)
 float ancien_gain = 3; // Variable utilisée pour checker un changement de gain
-float R_mcp ;
-
-
 
 Adafruit_SSD1306 ecranOLED(nombreDePixelsEnLargeur, nombreDePixelsEnHauteur, &Wire, brocheResetOLED); // Initilisation de l'écran
 
+// Variables pour le KY-040
 volatile unsigned int Pos_encodeur = 0; // Variable de l'encodeur
+unsigned int ancienne_pos = 0; // Variable utilisée pour checker un changement de position de l'encodeur
+// Variables pour le debounce du bouton
+int etatBouton = HIGH;             // L'état actuel du bouton (HIGH = non pressé, LOW = pressé)
+int dernierEtatBouton = HIGH;      // Le dernier état stable du bouton
+unsigned long dernierTempsDebounce = 0;  // Le dernier temps où le bouton a changé d'état
+unsigned long intervalleDebounce = 50;   // L'intervalle de debounce en millisecondes
 
 // Variables pour le Flex
 const float VCC = 5;      // Tension de l'Arduino
@@ -49,9 +53,9 @@ const float R_pli = 100000.0;  // Résistance à 90°
 
 void setup() {
   // Configurations des pins
-  pinMode(CLK, INPUT);
-  pinMode(DT, INPUT);
-  pinMode(SW, INPUT);
+  pinMode(CLK, INPUT_PULLUP);
+  pinMode(DT, INPUT_PULLUP);
+  pinMode(SW, INPUT_PULLUP);
   pinMode(txPin, OUTPUT);
   pinMode(rxPin, INPUT);
   pinMode(SS, OUTPUT);
@@ -64,10 +68,8 @@ void setup() {
   mySerial.begin(baudrate);
   Serial.begin(baudrate);
 
-  // Configuration de l'encodeur
-  digitalWrite(CLK, HIGH); // Active la résistance de pullup
-  digitalWrite(DT, HIGH); // Active la résistance de pullup
-  attachInterrupt(0, Encodeur_interrupt, RISING); // Interruption de CLK déclanche la fonction
+  // Configuration de l'interruption pour l'encodeur
+  attachInterrupt(digitalPinToInterrupt(CLK), Encodeur_interrupt, RISING);
 
   // Configuration du MCP41050
   digitalWrite(SS, HIGH); //SPI chip disabled
@@ -92,56 +94,93 @@ void loop() {
     EcritureSPI(valeur_mcp, SS); // Envoi vers le MCP41050
     ancien_gain = gain; // Mise à jour la valeur de l'ancien gain
   }
+  
+  /////////////////////////PARTIE FLEX
+  float flex_angle = Flex_read(); // Donne la résistance du FLEX
+  Serial.println(flex_angle); // A remplacer par l'envoie au bluetooth
+
+  /////////////////////////PARTIE KYC-040
+  noInterrupts(); // Désactive les interruptions pour une lecture atomique
+  unsigned int posActuelle = Pos_encodeur; // Copie atomique de Pos_encodeur
+  interrupts(); // Réactive les interruptions
+
+  if (posActuelle  != ancienne_pos){ // Si l'on détecte un changement
+    if (posActuelle  > ancienne_pos) { // Si c'est vers la droite
+      // Faire action droite
+    }
+    else { // Si c'est vers la gauche
+      // Faire action gauche
+    }
+    ancienne_pos = posActuelle; // Mise à jour de l'ancienne position
+  }
+
+  // Logique de debounce pour le bouton
+  int lectureBouton = digitalRead(SW); // On lit l'état du bouton
+  if (lectureBouton != dernierEtatBouton) { // S'il est différent
+    dernierTempsDebounce = millis(); // On timestamp le moment où il est appuyé
+  }
+
+  if ((millis() - dernierTempsDebounce) > intervalleDebounce) { // S'il est appuyé pendant un certain nombre de millisecondes
+    if (lectureBouton != etatBouton) { // Si l'état du bouton a changé
+      etatBouton = lectureBouton; // On modifie l'état
+      if (etatBouton == LOW) { // Si le bouton est effectivement pressé
+        // Faire action bouton pressé
+      }
+    }
+  }
+  dernierEtatBouton = lectureBouton; // On met à jour l'ancien état
+
+  /////////////////////////PARTIE BLUETOOTH
+  bluetooth_gain(); // Check si le gain n'est pas mis à jour par l'application
 }
 
-void Flex_read() {
-  float Vflex = analogRead(Flex) * VCC / 1023.0;
-  float Rflex = R_DIV * (VCC / Vflex - 1.0);
-  Serial.println("Resistance: " + String(Rflex) + " ohms");
-
-  // Use the calculated resistance to estimate the sensor's bend angle:
-  float angle = map(Rflex, R_plat, R_pli, 0, 90.0);
-  Serial.println("Bend: " + String(angle) + " degrees");
-  Serial.println();
+// Fonction qui retourne un float ayant pour valeur la résistance du FLEX
+float Flex_read() {
+  float Vflex = analogRead(Flex) * VCC / 1023.0; // Lecture de la tension aux bornes du FLEX
+  float Rflex = R_DIV * (VCC / Vflex - 1.0); // Calcul de la résistance du FLEX
+  float angle = (Rflex - R_plat) * (90.0 - 0) / (R_pli - R_plat) + 0; // Estimation de l'angle du FLEX
+  return Rflex;
 }
 
 // Pour envoyer les données au MCP41050
 void EcritureSPI(uint8_t valeur, uint8_t ssPin) {
   uint8_t cmd = 0x11; // Commande d'écriture pour MCP41050
-  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0)); // Ouvre l'échange
   digitalWrite(ssPin, LOW); // Sélection du chip
   SPI.transfer(cmd); // Envoyer la commande d'écriture
   SPI.transfer(valeur); // Envoyer la valeur associée
   digitalWrite(ssPin, HIGH); // Désélection du chip
-  SPI.endTransaction();
+  SPI.endTransaction(); // Ferme l'échange
 }
 
+// Fonction d'interrupt qui modifie l'état la variable de position lorsqu'il change
 void Encodeur_interrupt() {
-  if (digitalRead(DT)==HIGH) {
+  if (digitalRead(DT)==HIGH) { // Si l'on tourne à droite
     Pos_encodeur++;
-  } else {
+  } else { // Si l'on tourne à gauche
     Pos_encodeur--;
   }
 }
 
-int bluetooth_gain(){
-
-  while (Serial.available()) {
-	   do{
-       R_mcp = Serial.read()*392;
-       delay(3);
-     }
+// Pour reçevoir le gain s'il a changé
+void bluetooth_gain() {
+  if (mySerial.available()) { // Si des données sont à recevoir
+    String inputString = mySerial.readStringUntil('\n'); // Lit la chaîne jusqu'au retour à la ligne
+    int R_mcp = inputString.toInt(); // Convertit la chaîne en entier
+    if (R_mcp > 0) { // Vérifie que R_mcp est un nombre positif valide
+      gain = 1 + (R_amp / (R_mcp + R_wiper)); // Calcule le nouveau gain
+    }
   }
-
-  gain = 1+(R_amp/R_mcp);
-  return gain;
-
 }
 
-void bluetooth_graph(int R_flex, int R_capt){
-  while (mySerial.available()) {
-		Serial.print((R_capt)mySerial.read());
-    Serial.print((R_capt)mySerial.read());
-    Serial.print((R_flex)mySerial.read());
+// Pour envoyer les données en bluetooth
+void envoie_bluetooth(float R_capt, float R_flex){
+  // Convertit les valeurs entières en chaînes de caractères
+  String R_capt_str = String(R_capt);
+  String R_flex_str = String(R_flex);
 
+  // Envoie les données au HC-05
+  mySerial.println(R_capt_str); // Envoie R_capt suivi d'un retour à la ligne
+  mySerial.println(R_capt_str); // Envoie R_capt suivi d'un retour à la ligne
+  mySerial.println(R_flex_str); // Envoie R_flex suivi d'un retour à la ligne
 }
