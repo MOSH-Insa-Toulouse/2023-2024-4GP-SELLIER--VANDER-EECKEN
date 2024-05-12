@@ -29,6 +29,8 @@ En complément de la programmation Arduino, ce projet est accompagné de fichier
 - **Modules intégrés** : Communication Bluetooth, affichage sur écran OLED et interaction utilisateur via encodeur rotatoire.
 - **Design modulaire** : Fichiers KiCad pour un Shield UNO personnalisé.
 
+Pour plus d'informations, vous pouvez retrouver la datasheet du produit [ici](https://github.com/MOSH-Insa-Toulouse/2023-2024-4GP-SELLIER--VANDER-EECKEN/blob/main/Datasheet.pdf).
+
 
 ## 📦 Matériel nécessaire
 
